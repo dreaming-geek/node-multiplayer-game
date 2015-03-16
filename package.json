@@ -1,0 +1,16 @@
+{
+  "name": "multiTest",
+  "version": "1.0.0",
+  "description": "multiplayer-test",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Joseph Williams",
+  "license": "ISC",
+  "devDependencies": {
+    "engine.io": "^1.5.1",
+    "eureca.io": "^0.6.2",
+    "express": "^4.12.2"
+  }
+}

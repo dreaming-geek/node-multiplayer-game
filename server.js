@@ -15,9 +15,24 @@ var eurecaServer = new EurecaServer({
     allow:[
         'setId',
         'spawnEnemy',
-        'kill'
+        'kill',
+        'updateState'
     ]
 });
+
+eurecaServer.exports.handleKeys = function (keys) {
+    var conn = this.connection;
+    var updatedClient = clients[conn.id];
+
+    for (var c in clients)
+    {
+        var remote = clients[c].remote;
+        remote.updateState(updatedClient.id, keys);
+
+        // keep last known state and send it to new connected clients
+        clients[c].laststate = keys;
+    }
+};
 
 var clients = {};
 
@@ -56,7 +71,10 @@ eurecaServer.exports.handshake = function () {
         var remote = clients[c].remote;
         for (var cc in clients)
         {
-            remote.spawnEnemy(clients[cc].id, 0, 0);
+            // send latest known position
+            var x = clients[cc].laststate ? clients[cc].laststate.x: 0;
+            var y = clients[cc].laststate ? clients[cc].laststate.y: 0;
+            remote.spawnEnemy(clients[cc].id, x, y);
         }
     }
 }

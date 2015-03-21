@@ -30,6 +30,18 @@ var eurecaClientSetup = function () {
         tanksList[i] = tnk;
     }
 
+    eurecaClient.exports.updateState = function (id, state) {
+        if(tanksList[id])
+        {
+            tanksList[id].cursor = state;
+            tanksList[id].tank.x = state.x;
+            tanksList[id].tank.y = state.y;
+            tanksList[id].tank.angle = state.angle;
+            tanksList[id].turret.rotation = state.rot;
+            tanksList[id].update();
+        }
+    }
+
 };
 
 //
@@ -134,7 +146,25 @@ Tank.prototype.kill = function () {
 
 Tank.prototype.update = function() {
 
-    for (var i in this.input) this.cursor[i] = this.input[i];
+    var inputChanged = (
+        this.cursor.left != this.input.left ||
+        this.cursor.right != this.input.right ||
+        this.cursor.up != this.input.up ||
+        this.cursor.fire != this.input.fire
+    );
+
+    if(inputChanged)
+    {
+        if(this.tank.id == myId)
+        {
+            this.input.x = this.tank.x;
+            this.input.y = this.tank.y;
+            this.input.angle = this.tank.angle;
+            this.input.rot = this.turret.rotation;
+
+            eurecaServer.handleKeys(this.input);
+        }
+    }
 
     if (this.cursor.left)
     {
@@ -213,11 +243,12 @@ function create() {
 
     // creates the explosion animation
     explosions = game.add.group();
+
     for (var i = 0; i < 10; i++)
     {
         var explosionAnimation = explosions.create(0, 0, 'kaboom', [0], false);
         explosionAnimation.anchor.setTo(0.5, 0.5);
-        explosionAnimation.animation.add('kaboom');
+        explosionAnimation.animations.add('kaboom');
     }
 
     tank.bringToTop();
